@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
 fun MyApp(
     modifier: Modifier = Modifier
 ) {
-    var shouldShowOnboarding by remember { mutableStateOf(true) }
+    var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
     // In Compose, UI elements are not hidden, but rather they aren't added to the composition
     Surface(modifier) {
         if (shouldShowOnboarding) {
@@ -70,7 +71,7 @@ fun MyAppPreview() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     val expanded =
-        remember { mutableStateOf(false) } // This will remember the state value for each composable
+        rememberSaveable { mutableStateOf(false) } // This will remember the state value for each composable
     val extraPadding =
         if (expanded.value) 48.dp else 0.dp // we add an extra padding to the composable when the button is clicked
 
