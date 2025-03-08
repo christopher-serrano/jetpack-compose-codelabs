@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import site.cjserrano.basiccodelabs.ui.theme.BasicCodelabsTheme
 
@@ -70,10 +74,19 @@ fun MyAppPreview() {
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    val expanded =
-        rememberSaveable { mutableStateOf(false) } // This will remember the state value for each composable
-    val extraPadding =
-        if (expanded.value) 48.dp else 0.dp // we add an extra padding to the composable when the button is clicked
+    var expanded by rememberSaveable { mutableStateOf(false) } // This will remember the state value for each composable
+
+    val extraPaddingOld =
+        if (expanded) 48.dp else 0.dp // we add an extra padding to the composable when the button is clicked
+
+    // for animation... we modify the padding with an animation delegate
+    val extraPadding by animateDpAsState(
+        if (expanded) 48.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
 
     Surface(
         color = MaterialTheme.colorScheme.primary,
@@ -83,18 +96,18 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(bottom = extraPadding) // here we add the modifier for the composable (to be executed after clicking the button)
+                    .padding(bottom = extraPadding.coerceAtLeast(0.dp)) // here we add the modifier for the composable (to be executed after clicking the button)
             ) {
                 Text(text = "Hello ")
                 Text(text = "${name}!")
             }
             ElevatedButton(
                 onClick = {
-                    expanded.value =
-                        !expanded.value // here we change the state value of the composable, which will be recomposed and then redrawn in the UI
+                    expanded =
+                        !expanded // here we change the state value of the composable, which will be recomposed and then redrawn in the UI
                 }
             ) {
-                Text(if (expanded.value) "Show Less" else "Show More")
+                Text(if (expanded) "Show Less" else "Show More")
             }
         }
     }
